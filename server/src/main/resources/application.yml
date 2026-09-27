@@ -15,3 +15,9 @@ spring:
 agentlens:
   cost:
     price-file: ${PRICE_FILE:classpath:model-prices.yaml}
+  eval:
+    replay-timeout-ms: ${EVAL_REPLAY_TIMEOUT_MS:60000}
+    judge:
+      base-url: ${JUDGE_BASE_URL:}
+      api-key: ${JUDGE_API_KEY:}
+      model: ${JUDGE_MODEL:}
