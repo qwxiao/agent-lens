@@ -14,6 +14,7 @@
 
   <modules>
     <module>server</module>
+    <module>cli</module>
     <module>examples/minimal-agent</module>
   </modules>
 </project>
