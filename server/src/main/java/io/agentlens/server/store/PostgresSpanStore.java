@@ -38,6 +38,15 @@ public class PostgresSpanStore implements SpanStore {
             ORDER BY start_time, span_id
             """;
 
+    private static final String SELECT_BY_ATTRIBUTES = """
+            SELECT trace_id, span_id, parent_span_id, name, span_kind, start_time, end_time,
+                   service_name, scope_name, scope_version, status_code, status_message,
+                   attributes, resource_attributes, events, links
+            FROM spans
+            WHERE attributes @> ?::jsonb
+            ORDER BY start_time, span_id
+            """;
+
     private final JdbcTemplate jdbc;
 
     public PostgresSpanStore(JdbcTemplate jdbc) {
@@ -99,6 +108,16 @@ public class PostgresSpanStore implements SpanStore {
             ps.setArray(1, con.createArrayOf("text", ids));
             return ps;
         }, (rs, rowNum) -> mapRow(rs));
+    }
+
+    @Override
+    public List<SpanRecord> findByAttributes(java.util.Map<String, String> attributeEquals) {
+        if (attributeEquals.isEmpty()) {
+            return List.of();
+        }
+        var expected = MAPPER.createObjectNode();
+        attributeEquals.forEach(expected::put);
+        return jdbc.query(SELECT_BY_ATTRIBUTES, (rs, rowNum) -> mapRow(rs), expected.toString());
     }
 
     private static SpanRecord mapRow(ResultSet rs) throws SQLException {

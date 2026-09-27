@@ -2,6 +2,7 @@ package io.agentlens.server.store;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Persistence boundary for spans. Isolating storage behind this interface keeps the
@@ -18,4 +19,7 @@ public interface SpanStore {
     long countTraces();
 
     List<SpanRecord> findByTraceIds(Collection<String> traceIds);
+
+    /** Spans whose attributes contain every given key/value pair (jsonb containment). */
+    List<SpanRecord> findByAttributes(Map<String, String> attributeEquals);
 }
