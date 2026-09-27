@@ -30,7 +30,7 @@
 
 - [x] `cli/`：`agentlens eval run --gate`，评测不达标退出码非零，可挂 CI（契约见 ADR 0005）
 - [x] `sdk-java/`：Spring AI / LangChain4j 一行接入的薄 SDK（OTel API + OTLP/JSON exporter，ADR 0006）
-- [ ] 接入两个真实异构 Agent（一个 Python CLI 项目、一个 Java 平台项目）作为活体示例
+- [x] 异构 Agent 活体示例：仓内 `examples/python-agent`（纯 stdlib Python，裸 OTLP/HTTP + ADR 0004 重放端点，端到端跑通 CLI 门禁与双通道成本归因）；外部真实仓库的接入延后
 - [ ] 发布 v0.1.0 + 博客一篇
 
 **验收**：第三方仓库按 README 十分钟完成接入并跑通一次门禁评测。
