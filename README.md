@@ -3,7 +3,7 @@
 > Lightweight, self-hosted observability & evaluation platform for LLM agents.
 > 轻量、自托管的 Agent 可观测性与评测平台。
 
-**Status: M1 in active development — OTLP ingestion, trace waterfall and cost accounting are working; evaluation engine is next.** See [docs/PLAN.md](docs/PLAN.md) for the roadmap.
+**Status: M2 in active development — OTLP ingestion, trace waterfall and cost accounting are working; the evaluation engine (datasets, replay runs, scorers, run comparison) just landed.** See [docs/PLAN.md](docs/PLAN.md) for the roadmap.
 
 ## Why
 
@@ -48,6 +48,28 @@ Costs are computed at query time from `gen_ai.usage.*` against
 GET /api/traces?limit=50&offset=0   → { "traces": [TraceSummary], "total": n }
 GET /api/traces/{traceId}           → TraceDetail (summary + ordered spans for the waterfall)
 ```
+
+## Evaluation (M2)
+
+Replay datasets against a target agent and score the outputs — the target only needs
+one synchronous HTTP endpoint ([ADR 0004](docs/adr/0004-eval-contracts-and-deps.md)):
+
+```
+POST /api/datasets                        {"name": "..."}                     → Dataset
+PUT  /api/datasets/{id}/cases             JSONL, one case per line            → {"upserted": n}
+POST /api/datasets/{id}/cases/from-trace/{traceId}                            → snapshot a trace as a case
+POST /api/eval-runs                       {"datasetId", "targetUrl",          → 202, run executes
+                                           "scorers": ["exact_match",            asynchronously
+                                           "json_schema", "llm_judge"]}
+GET  /api/eval-runs/{id}                  → per-case results, scores, attributed cost
+GET  /api/eval-runs/{a}/compare/{b}       → pass-rate / latency / cost diff per case
+```
+
+Replayed agents either answer with `{"output": "...", "trace_id": "..."}` (trace_id is
+the preferred cost-attribution channel) or tag their spans with
+`agentlens.eval.run_id` / `agentlens.eval.case_id` as the fallback. The LLM judge speaks
+any OpenAI-compatible `/chat/completions` endpoint via `JUDGE_BASE_URL` / `JUDGE_API_KEY`
+/ `JUDGE_MODEL`.
 
 ## Architecture
 

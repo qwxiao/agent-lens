@@ -17,12 +17,12 @@
 
 **验收**：任一 LangChain4j demo 用 OTel 自动埋点，10 分钟内在平台看到 waterfall 和这条调用的成本。
 
-## M2 — 评测引擎（第 2 周）
+## M2 — 评测引擎（第 2 周，已完成 2026-09-27）
 
-- [ ] 数据集管理（JSONL 格式，case 可从线上 trace 一键固化）
-- [ ] 重放 Runner：对数据集批量跑目标 Agent
-- [ ] 三种评分器：精确匹配 / JSON Schema 校验 / LLM-as-judge
-- [ ] Run 对比视图：两次 run 的通过率、成本、延迟 diff
+- [x] 数据集管理（JSONL 格式，case 可从线上 trace 一键固化）
+- [x] 重放 Runner：对数据集批量跑目标 Agent
+- [x] 三种评分器：精确匹配 / JSON Schema 校验 / LLM-as-judge
+- [x] Run 对比视图：两次 run 的通过率、成本、延迟 diff
 
 **验收**：改一版 prompt 重跑，平台展示成功率与成本的变化对比。
 
