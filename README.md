@@ -138,7 +138,7 @@ distribution ([ADR 0002](docs/adr/0002-single-binary-postgres.md)), locked versi
 
 ```
 server/                Spring Boot service: ingestion, storage, API (dashboard UI included)
-examples/              Runnable demos (raw OTLP/HTTP agent)
+examples/              Runnable demos: raw OTLP/HTTP agents in Java and Python (the Python one is evaluable end to end)
 sdk-java/              Thin client SDK: standard OTel wired to agent-lens (ADR 0006)
 cli/                   agentlens CLI: eval runner + CI gate
 docs/                  Roadmap and architecture decision records (zh-CN)

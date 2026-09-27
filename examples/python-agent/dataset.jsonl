@@ -1,0 +1,4 @@
+{"id":"add-1","input":{"question":"17+25"},"expected_output":"42"}
+{"id":"add-2","input":{"question":"100+200"},"expected_output":"300"}
+{"id":"greet-1","input":{"question":"say hi"},"expected_output":"hello"}
+{"id":"hard-1","input":{"question":"what is the meaning of life"},"expected_output":"42"}
