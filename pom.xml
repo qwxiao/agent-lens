@@ -15,6 +15,7 @@
   <modules>
     <module>server</module>
     <module>cli</module>
+    <module>sdk-java</module>
     <module>examples/minimal-agent</module>
   </modules>
 </project>
