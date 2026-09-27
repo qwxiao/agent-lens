@@ -28,7 +28,7 @@
 
 ## M3 — 门禁与真实接入（第 3 周）
 
-- [ ] `cli/`：`agentlens eval run --gate`，评测不达标退出码非零，可挂 CI
+- [x] `cli/`：`agentlens eval run --gate`，评测不达标退出码非零，可挂 CI（契约见 ADR 0005）
 - [ ] `sdk-java/`：Spring AI / LangChain4j 一行接入的薄 SDK
 - [ ] 接入两个真实异构 Agent（一个 Python CLI 项目、一个 Java 平台项目）作为活体示例
 - [ ] 发布 v0.1.0 + 博客一篇

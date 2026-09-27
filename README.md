@@ -3,7 +3,7 @@
 > Lightweight, self-hosted observability & evaluation platform for LLM agents.
 > 轻量、自托管的 Agent 可观测性与评测平台。
 
-**Status: M2 in active development — OTLP ingestion, trace waterfall and cost accounting are working; the evaluation engine (datasets, replay runs, scorers, run comparison) just landed.** See [docs/PLAN.md](docs/PLAN.md) for the roadmap.
+**Status: M3 in progress — OTLP ingestion, trace waterfall, cost accounting and the evaluation engine (datasets, replay runs, scorers, run comparison) are working; the CI gate CLI just landed.** See [docs/PLAN.md](docs/PLAN.md) for the roadmap.
 
 ## Why
 
@@ -71,6 +71,27 @@ the preferred cost-attribution channel) or tag their spans with
 any OpenAI-compatible `/chat/completions` endpoint via `JUDGE_BASE_URL` / `JUDGE_API_KEY`
 / `JUDGE_MODEL`.
 
+## CI gate
+
+The `agentlens` CLI starts an evaluation run on the platform, waits for it to settle
+and turns the outcome into a CI exit code — datasets, scorers and cost attribution
+stay in one place, the server ([ADR 0005](docs/adr/0005-cli-gate-contract.md)):
+
+```bash
+./mvnw -pl cli package                # → cli/target/agentlens.jar (executable fat jar)
+
+java -jar cli/target/agentlens.jar eval run \
+  --dataset <dataset-id> \
+  --target http://localhost:9000/replay \
+  --scorers exact_match,json_schema \
+  --gate 0.9
+```
+
+Exit codes: `0` run completed and the gate is met (or no gate requested), `1` run
+completed but the pass rate is below `--gate`, `2` bad usage / platform unreachable /
+run failed / timed out. Point `--server` (or the `AGENTLENS_URL` environment variable)
+at a non-default platform.
+
 ## Architecture
 
 ```
@@ -86,8 +107,10 @@ any agent (Java / Python / Node / ...)
 
 Design decisions are recorded as ADRs in [docs/adr/](docs/adr/) — the data contract
 ([ADR 0001](docs/adr/0001-otel-genai-as-data-contract.md)), the single-binary + PostgreSQL
-distribution ([ADR 0002](docs/adr/0002-single-binary-postgres.md)), and locked versions
-([ADR 0003](docs/adr/0003-tech-stack-versions.md)).
+distribution ([ADR 0002](docs/adr/0002-single-binary-postgres.md)), locked versions
+([ADR 0003](docs/adr/0003-tech-stack-versions.md)), the evaluation contracts
+([ADR 0004](docs/adr/0004-eval-contracts-and-deps.md)) and the CLI gate contract
+([ADR 0005](docs/adr/0005-cli-gate-contract.md)).
 
 ## Repository layout
 
@@ -95,7 +118,7 @@ distribution ([ADR 0002](docs/adr/0002-single-binary-postgres.md)), and locked v
 server/                Spring Boot service: ingestion, storage, API (dashboard UI included)
 examples/              Runnable demos (raw OTLP/HTTP agent)
 sdk-java/              Thin Java client SDK (planned)
-cli/                   agentlens CLI: eval runner + CI gate (planned)
+cli/                   agentlens CLI: eval runner + CI gate
 docs/                  Roadmap and architecture decision records (zh-CN)
 ```
 
