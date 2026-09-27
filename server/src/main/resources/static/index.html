@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>agent-lens</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#">agent<span>-lens</span></a>
+  <span class="tagline">agent traces · tokens · cost</span>
+</header>
+
+<main id="list-view">
+  <div class="toolbar">
+    <h1>Traces <span id="trace-count" class="count"></span></h1>
+    <div class="actions">
+      <label class="toggle"><input type="checkbox" id="auto-refresh"> auto refresh</label>
+      <button id="refresh-btn">Refresh</button>
+    </div>
+  </div>
+  <p id="list-error" class="error" hidden></p>
+  <table class="traces">
+    <thead>
+      <tr>
+        <th>started</th>
+        <th>service</th>
+        <th>root span</th>
+        <th class="num">spans</th>
+        <th class="num">duration</th>
+        <th class="num">tokens in / out</th>
+        <th class="num">cost</th>
+      </tr>
+    </thead>
+    <tbody id="traces-body"></tbody>
+  </table>
+  <p id="empty-hint" class="empty" hidden>
+    No traces yet. Send OTLP/JSON spans to <code>POST /v1/traces</code> —
+    see <code>examples/minimal-agent</code> for a ten-second demo.
+  </p>
+</main>
+
+<main id="detail-view" hidden>
+  <a class="back" href="#">&larr; all traces</a>
+  <h1 id="detail-title"></h1>
+  <div id="detail-chips" class="chips"></div>
+  <section>
+    <h2>Waterfall</h2>
+    <div id="waterfall"></div>
+  </section>
+</main>
+
+<footer>
+  ingest <code>POST /v1/traces</code> (OTLP/JSON) · storage PostgreSQL ·
+  <code>gen_ai.*</code> attributes kept verbatim
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
