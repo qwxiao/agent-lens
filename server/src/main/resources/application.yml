@@ -1,0 +1,17 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: agent-lens
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:agentlens}
+    username: ${DB_USER:agentlens}
+    password: ${DB_PASSWORD:agentlens}
+  flyway:
+    connect-retries: 10
+    connect-retries-interval: 2s
+
+agentlens:
+  cost:
+    price-file: ${PRICE_FILE:classpath:model-prices.yaml}
