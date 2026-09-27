@@ -1,0 +1,63 @@
+# Model list prices used for cost accounting.
+# Approximate public prices, USD per 1M tokens (input / output).
+# Model ids are matched exactly first, then by the longest matching prefix
+# (e.g. "gpt-4o-2024-08-06" is priced as "gpt-4o"). Unknown models show no cost.
+# Edit this file or point agentlens.cost.price-file at your own copy.
+prices:
+  - model: gpt-4o
+    input-per-1m: 2.50
+    output-per-1m: 10.00
+  - model: gpt-4o-mini
+    input-per-1m: 0.15
+    output-per-1m: 0.60
+  - model: gpt-4.1
+    input-per-1m: 2.00
+    output-per-1m: 8.00
+  - model: gpt-4.1-mini
+    input-per-1m: 0.40
+    output-per-1m: 1.60
+  - model: gpt-4.1-nano
+    input-per-1m: 0.10
+    output-per-1m: 0.40
+  - model: o3
+    input-per-1m: 2.00
+    output-per-1m: 8.00
+  - model: o4-mini
+    input-per-1m: 1.10
+    output-per-1m: 4.40
+  - model: claude-opus-4
+    input-per-1m: 15.00
+    output-per-1m: 75.00
+  - model: claude-sonnet-4-5
+    input-per-1m: 3.00
+    output-per-1m: 15.00
+  - model: claude-sonnet-4
+    input-per-1m: 3.00
+    output-per-1m: 15.00
+  - model: claude-haiku-4-5
+    input-per-1m: 1.00
+    output-per-1m: 5.00
+  - model: claude-3-5-haiku
+    input-per-1m: 0.80
+    output-per-1m: 4.00
+  - model: gemini-2.5-pro
+    input-per-1m: 1.25
+    output-per-1m: 10.00
+  - model: gemini-2.5-flash
+    input-per-1m: 0.30
+    output-per-1m: 2.50
+  - model: deepseek-chat
+    input-per-1m: 0.27
+    output-per-1m: 1.10
+  - model: deepseek-reasoner
+    input-per-1m: 0.55
+    output-per-1m: 2.19
+  - model: qwen-max
+    input-per-1m: 1.60
+    output-per-1m: 6.40
+  - model: qwen-plus
+    input-per-1m: 0.40
+    output-per-1m: 1.20
+  - model: qwen-turbo
+    input-per-1m: 0.05
+    output-per-1m: 0.40
