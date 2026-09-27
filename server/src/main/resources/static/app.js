@@ -188,17 +188,143 @@ function prettySpan(span) {
   }, null, 2);
 }
 
+/* ---------- evals: datasets & runs ---------- */
+
+const pickedRuns = new Set();
+
+function fmtPassRate(rate) {
+  return `${Math.round((rate ?? 0) * 100)}%`;
+}
+
+async function loadEvals() {
+  pickedRuns.clear();
+  const compareBtn = document.querySelector('#compare-btn');
+  compareBtn.disabled = true;
+  const [datasets, runs] = await Promise.all([getJson('/api/datasets'), getJson('/api/eval-runs')]);
+
+  const dsBody = document.querySelector('#datasets-body');
+  dsBody.innerHTML = '';
+  document.querySelector('#datasets-empty').hidden = datasets.length > 0;
+  for (const d of datasets) {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${esc(d.name)}</td>
+      <td class="muted">${esc(d.description ?? '')}</td>
+      <td class="num">${d.caseCount}</td>
+      <td class="mono">${esc(fmtTime(d.createdAt))}</td>`;
+    dsBody.appendChild(row);
+  }
+
+  const runBody = document.querySelector('#runs-body');
+  runBody.innerHTML = '';
+  document.querySelector('#runs-empty').hidden = runs.length > 0;
+  for (const r of runs) {
+    const row = document.createElement('tr');
+    const passRate = r.caseCount > 0 ? Math.round((r.passedCount / r.caseCount) * 100) : 0;
+    const statusBadge = r.status === 'completed' ? 'pass'
+      : r.status === 'failed' ? 'fail' : 'running';
+    row.innerHTML = `
+      <td><input type="checkbox" class="run-pick" data-run="${esc(r.id)}"></td>
+      <td>${esc(r.name)}<div class="muted small mono">${esc(r.targetUrl)}</div></td>
+      <td><span class="badge ${statusBadge}">${esc(r.status)}</span></td>
+      <td class="num">${fmtPassRate(passRate)}</td>
+      <td class="num">${r.passedCount} / ${r.caseCount}</td>
+      <td class="num">${r.caseCount > 0 ? Math.round(r.avgLatencyMs ?? 0) + ' ms' : '—'}</td>
+      <td class="mono">${esc(fmtTime(r.startedAt))}</td>`;
+    runBody.appendChild(row);
+  }
+  runBody.querySelectorAll('.run-pick').forEach((box) => {
+    box.addEventListener('change', () => {
+      if (box.checked) {
+        pickedRuns.add(box.dataset.run);
+        if (pickedRuns.size > 2) {
+          const oldest = pickedRuns.values().next().value;
+          pickedRuns.delete(oldest);
+          runBody.querySelector(`[data-run="${oldest}"]`).checked = false;
+        }
+      } else {
+        pickedRuns.delete(box.dataset.run);
+      }
+      compareBtn.disabled = pickedRuns.size !== 2;
+    });
+  });
+  compareBtn.onclick = () => {
+    const [a, b] = [...pickedRuns];
+    location.hash = `#/evals/compare/${encodeURIComponent(a)}/${encodeURIComponent(b)}`;
+  };
+}
+
+/* ---------- evals: run comparison ---------- */
+
+function caseVerdict(cell, passed, label) {
+  if (passed === true) cell.innerHTML += `<span class="badge pass">${label} pass</span>`;
+  else if (passed === false) cell.innerHTML += `<span class="badge fail">${label} fail</span>`;
+  else cell.innerHTML += `<span class="badge muted-badge">${label} —</span>`;
+}
+
+async function loadCompare(a, b) {
+  const comparison = await getJson(`/api/eval-runs/${encodeURIComponent(a)}/compare/${encodeURIComponent(b)}`);
+  const totalsA = comparison.runA.totals ?? {};
+  const totalsB = comparison.runB.totals ?? {};
+  document.querySelector('#compare-totals').innerHTML = [
+    chip('mono', `${comparison.runA.run.name ?? 'run A'} → ${comparison.runB.run.name ?? 'run B'}`),
+    chip('pass', `pass rate ${fmtPassRate(totalsA.passRate)} → ${fmtPassRate(totalsB.passRate)}`),
+    chip('', `${fmtTokens(totalsA.inputTokens ?? 0)}/${fmtTokens(totalsA.outputTokens ?? 0)} → ${fmtTokens(totalsB.inputTokens ?? 0)}/${fmtTokens(totalsB.outputTokens ?? 0)} tokens`),
+    chip('cost', `${fmtCost(totalsA.costUsd)} → ${fmtCost(totalsB.costUsd)}`),
+    chip('', `avg latency ${fmtDuration(totalsA.avgLatencyMs)} → ${fmtDuration(totalsB.avgLatencyMs)}`),
+  ].join('');
+
+  const body = document.querySelector('#compare-body');
+  body.innerHTML = '';
+  for (const c of comparison.cases) {
+    const row = document.createElement('tr');
+    const latencyA = c.latencyMsA ?? '—';
+    const latencyB = c.latencyMsB ?? '—';
+    const costA = c.costA != null ? fmtCost(c.costA) : '—';
+    const costB = c.costB != null ? fmtCost(c.costB) : '—';
+    const error = c.errorA ?? c.errorB ?? '';
+    let note = error;
+    if (c.passedA === true && c.passedB === false) note = `${note ? note + ' · ' : ''}regressed vs A`;
+    if (c.passedA === false && c.passedB === true) note = `${note ? note + ' · ' : ''}improved vs A`;
+    row.innerHTML = `
+      <td class="mono">${esc(c.caseId)}</td>
+      <td class="num"></td>
+      <td class="num"></td>
+      <td class="num muted">${esc(String(latencyA))} / ${esc(String(latencyB))} ms</td>
+      <td class="num">${esc(costA)} / ${esc(costB)}</td>
+      <td class="muted small">${esc(note)}</td>`;
+    caseVerdict(row.cells[1], c.passedA, 'A');
+    caseVerdict(row.cells[2], c.passedB, 'B');
+    body.appendChild(row);
+  }
+}
+
 /* ---------- routing & polling ---------- */
 
+function show(view) {
+  for (const id of ['list-view', 'detail-view', 'evals-view', 'compare-view']) {
+    document.querySelector(`#${id}`).hidden = id !== view;
+  }
+  const tab = view === 'list-view' ? 'traces' : 'evals';
+  document.querySelectorAll('.nav a').forEach((link) => {
+    link.classList.toggle('active', link.dataset.nav === tab);
+  });
+}
+
 function route() {
-  const match = location.hash.match(/^#\/traces\/(.+)$/);
-  if (match) {
-    document.querySelector('#list-view').hidden = true;
-    document.querySelector('#detail-view').hidden = false;
-    loadDetail(decodeURIComponent(match[1]));
+  const traceMatch = location.hash.match(/^#\/traces\/(.+)$/);
+  const compareMatch = location.hash.match(/^#\/evals\/compare\/([^/]+)\/([^/]+)$/);
+  if (traceMatch) {
+    show('detail-view');
+    loadDetail(decodeURIComponent(traceMatch[1]));
+  } else if (compareMatch) {
+    show('compare-view');
+    loadCompare(decodeURIComponent(compareMatch[1]), decodeURIComponent(compareMatch[2]));
+  } else if (location.hash.startsWith('#/evals')) {
+    show('evals-view');
+    loadEvals();
   } else {
-    document.querySelector('#detail-view').hidden = true;
-    document.querySelector('#list-view').hidden = false;
+    show('list-view');
     loadList();
   }
 }
