@@ -13,7 +13,7 @@
 
   <groupId>io.agentlens</groupId>
   <artifactId>agentlens-sdk</artifactId>
-  <version>0.1.0</version>
+  <version>0.2.0-SNAPSHOT</version>
   <name>agent-lens-sdk</name>
   <description>Thin client SDK: standard OpenTelemetry wired to agent-lens over OTLP/HTTP JSON (ADR 0006)</description>
 
