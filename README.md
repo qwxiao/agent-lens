@@ -3,7 +3,7 @@
 > Lightweight, self-hosted observability & evaluation platform for LLM agents.
 > 轻量、自托管的 Agent 可观测性与评测平台。
 
-**Status: M3 in progress — OTLP ingestion, trace waterfall, cost accounting and the evaluation engine (datasets, replay runs, scorers, run comparison) are working; the CI gate CLI just landed.** See [docs/PLAN.md](docs/PLAN.md) for the roadmap.
+**Status: v0.1.0 released — OTLP ingestion, trace waterfall, cost accounting, the evaluation engine, the CI gate CLI and the thin SDK all work.** See [docs/PLAN.md](docs/PLAN.md) for the roadmap and [CHANGELOG.md](CHANGELOG.md) for what shipped.
 
 ## Why
 
@@ -156,4 +156,4 @@ See [docs/PLAN.md](docs/PLAN.md).
 
 ## License
 
-TBD before first public release.
+Apache-2.0 — see [LICENSE](LICENSE).

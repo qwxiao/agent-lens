@@ -13,7 +13,7 @@
 
   <groupId>io.agentlens</groupId>
   <artifactId>agentlens-cli</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
   <name>agent-lens-cli</name>
   <description>agentlens command line: eval runner and CI gate (ADR 0005)</description>
 
