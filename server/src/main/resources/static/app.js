@@ -220,7 +220,7 @@ async function loadEvals() {
   document.querySelector('#runs-empty').hidden = runs.length > 0;
   for (const r of runs) {
     const row = document.createElement('tr');
-    const passRate = r.caseCount > 0 ? Math.round((r.passedCount / r.caseCount) * 100) : 0;
+    const passRate = r.caseCount > 0 ? r.passedCount / r.caseCount : 0;
     const statusBadge = r.status === 'completed' ? 'pass'
       : r.status === 'failed' ? 'fail' : 'running';
     row.innerHTML = `
@@ -305,7 +305,7 @@ function show(view) {
   for (const id of ['list-view', 'detail-view', 'evals-view', 'compare-view']) {
     document.querySelector(`#${id}`).hidden = id !== view;
   }
-  const tab = view === 'list-view' ? 'traces' : 'evals';
+  const tab = view === 'detail-view' || view === 'list-view' ? 'traces' : 'evals';
   document.querySelectorAll('.nav a').forEach((link) => {
     link.classList.toggle('active', link.dataset.nav === tab);
   });
